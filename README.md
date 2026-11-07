@@ -1,11 +1,5 @@
 
 
-## Projetos
-
-| Projeto | Descrição |
-| :--- | :--- |
-| [Linvery](https://linvery.online/) | Webapp e PWA de entregas locais que conecta estabelecimentos e entregadores. Inclui acompanhamento de pedidos, notificações e painel administrativo. |
-
 ## Tecnologias
 
 | Aplicação | Dados e infraestrutura |
