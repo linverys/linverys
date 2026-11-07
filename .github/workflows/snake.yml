@@ -1,0 +1,51 @@
+name: Cobrinha de contribuições
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/snake.yml']
+  schedule:
+    - cron: '17 6 * * *'
+permissions:
+  contents: read
+concurrency: contribution-snake
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: Platane/snk/svg-only@v3.5.0
+        with:
+          github_user_name: linverys
+          outputs: |
+            dist/snake.svg
+            dist/snake-dark.svg?palette=github-dark
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: snake
+          path: dist/*.svg
+  publish:
+    needs: generate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Selecionar branch de imagens
+        run: |
+          if git ls-remote --exit-code --heads origin output; then
+            git fetch origin output
+            git switch -C output FETCH_HEAD
+          else
+            git switch --orphan output
+          fi
+      - uses: actions/download-artifact@v4
+        with:
+          name: snake
+      - name: Publicar imagens
+        run: |
+          git add snake.svg snake-dark.svg
+          if git diff --cached --quiet; then exit 0; fi
+          git -c user.name=github-actions -c user.email=41898282+github-actions[bot]@users.noreply.github.com commit -m "Atualiza animação do perfil"
+          git push origin HEAD:output
